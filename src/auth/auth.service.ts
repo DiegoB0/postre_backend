@@ -1,16 +1,20 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RegisterDto, LoginDto } from './dto/request.dto';
 import { User } from './entities/usuarios.entity';
 import * as bcrypt from 'bcryptjs';
+import { ApiKey } from './entities/api_keys.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
     private userRepo: Repository<User>,
+    @InjectRepository(ApiKey)
+    private apiKeyRepo: Repository<ApiKey>,
     private jwtService: JwtService,
   ) {
     //Params for the constructor
@@ -53,5 +57,21 @@ export class AuthService {
     return {
       access_token: this.jwtService.sign(payload),
     };
+  }
+
+  async createApiKey(userId: string) {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new UnauthorizedException('Unser not found');
+    }
+
+    const apiKey = this.apiKeyRepo.create({
+      key: uuidv4(),
+      revoked: false,
+      user,
+    });
+
+    return await this.apiKeyRepo.save(apiKey);
   }
 }

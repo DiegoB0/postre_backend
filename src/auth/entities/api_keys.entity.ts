@@ -1,10 +1,27 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  CreateDateColumn,
+} from 'typeorm';
 
-@Entity()
+import { User } from './usuarios.entity';
+
+@Entity('api_keys')
 export class ApiKey {
-  @PrimaryGeneratedColumn('identity')
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ unique: true })
   key: string;
+
+  @ManyToOne(() => User, (user) => user.apiKeys, { onDelete: 'CASCADE' })
+  user: User;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @Column({ default: false })
+  revoked: boolean;
 }

@@ -6,10 +6,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { User } from './entities/usuarios.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ApiKey } from './entities/api_keys.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, ApiKey]),
     ConfigModule,
     PassportModule,
     JwtModule.registerAsync({

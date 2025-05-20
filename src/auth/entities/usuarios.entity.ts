@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { ApiKey } from './api_keys.entity';
 
 @Entity('usuarios')
 export class User {
@@ -22,4 +23,7 @@ export class User {
 
   @Column('text', { array: true, nullable: true })
   roles: string[] | null;
+
+  @OneToMany(() => ApiKey, (apiKey) => apiKey.user)
+  apiKeys: ApiKey[];
 }

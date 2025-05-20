@@ -1,6 +1,8 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto } from './dto/request.dto';
+import { GetUser } from './decorators/user.decorator';
+import { User } from './entities/usuarios.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -16,5 +18,10 @@ export class AuthController {
   @Post('login')
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
+  }
+
+  @Post()
+  generateApiKey(@GetUser() user: User) {
+    return this.authService.createApiKey(user.id);
   }
 }
