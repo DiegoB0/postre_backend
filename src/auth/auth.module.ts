@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { User } from './entities/usuarios.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApiKey } from './entities/api_keys.entity';
+import { JwtStrategy } from './strategy/jwt.strategy';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { ApiKey } from './entities/api_keys.entity';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, JwtStrategy],
   exports: [AuthService],
 })
 export class AuthModule {
