@@ -59,8 +59,13 @@ export class AuthService {
     };
   }
 
-  async createApiKey(userId: string) {
-    const user = await this.userRepo.findOne({ where: { id: userId } });
+  async createApiKey(incomingUser: User) {
+    const user = await this.userRepo.findOne({
+      where: { id: incomingUser.id },
+    });
+
+    console.log(user);
+    console.log('Heyyy');
 
     if (!user) {
       throw new UnauthorizedException('Unser not found');
