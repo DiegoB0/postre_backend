@@ -1,5 +1,9 @@
 # POStre Backend API
 
+<p align="center">
+  <img src="assets/postre_logo.jpeg" alt="POStre Logo" width="200"/>
+</p>
+
 This is the backend API for the POStre project - a point of sales system built for local restaurants
 
 ---
@@ -56,6 +60,23 @@ then
 ```bash
 npm run build
 npm run start:prod
+```
+
+### Docker (For CI/CD pipelines)
+
+Requirements:
+Install docker at: <https://www.docker.com/>
+
+1. **Build the docker image:**
+
+```bash
+docker build -t postre-backend .
+```
+
+2. **Run the container:**
+
+```bash
+docker run --env-file .env -p 3000:3000 postre-backend
 
 ```
 
