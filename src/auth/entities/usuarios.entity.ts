@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { ApiKey } from './api_keys.entity';
+import { UsuarioRol } from './usuario_rol.entity';
 
 @Entity('usuarios')
 export class User {
@@ -21,8 +22,8 @@ export class User {
   @Column('bool', { default: true })
   isActive: boolean;
 
-  @Column('text', { array: true, nullable: true })
-  roles: string[] | null;
+  @OneToMany(() => UsuarioRol, (ur: UsuarioRol) => ur.usuario)
+  usuarioRoles: UsuarioRol[];
 
   @OneToMany(() => ApiKey, (apiKey) => apiKey.user)
   apiKeys: ApiKey[];

@@ -8,10 +8,21 @@ import { User } from './entities/usuarios.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApiKey } from './entities/api_keys.entity';
 import { JwtStrategy } from './strategy/jwt.strategy';
+import { Rol } from './entities/roles.entity';
+import { RolPermiso } from './entities/rol_permiso.entity';
+import { UsuarioRol } from './entities/usuario_rol.entity';
+import { Permiso } from './entities/permisos.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, ApiKey]),
+    TypeOrmModule.forFeature([
+      User,
+      ApiKey,
+      Rol,
+      RolPermiso,
+      UsuarioRol,
+      Permiso,
+    ]),
     ConfigModule,
     PassportModule,
     JwtModule.registerAsync({

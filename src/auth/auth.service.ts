@@ -7,6 +7,7 @@ import { RegisterDto, LoginDto } from './dto/request.dto';
 import { User } from './entities/usuarios.entity';
 import * as bcrypt from 'bcryptjs';
 import { ApiKey } from './entities/api_keys.entity';
+import { UsuarioRol } from './entities/usuario_rol.entity';
 
 @Injectable()
 export class AuthService {
@@ -15,13 +16,16 @@ export class AuthService {
     private userRepo: Repository<User>,
     @InjectRepository(ApiKey)
     private apiKeyRepo: Repository<ApiKey>,
+    @InjectRepository(UsuarioRol)
+    private readonly usuarioRolRepo: Repository<UsuarioRol>,
+
     private jwtService: JwtService,
   ) {
     //Params for the constructor
   }
 
   async register(dto: RegisterDto) {
-    const { email } = dto;
+    const { email, name, password, roles = [] } = dto;
 
     const existingUser = await this.userRepo.findOne({ where: { email } });
     if (existingUser) {
@@ -30,10 +34,33 @@ export class AuthService {
       );
     }
 
-    const hash = await bcrypt.hash(dto.password, 10);
-    const user = this.userRepo.create({ ...dto, password: hash });
+    // Hash password
+    const hash = await bcrypt.hash(password, 10);
+
+    // Create and save user (exclude roles!)
+    const user = this.userRepo.create({
+      email,
+      name,
+      password: hash,
+    });
+
     await this.userRepo.save(user);
+
+    // Insert roles into pivot table
+    if (roles.length > 0) {
+      const roleLinks = roles.map((rolId) =>
+        this.usuarioRolRepo.create({
+          usuario: { id: user.id },
+          rol: { id: rolId },
+        }),
+      );
+
+      await this.usuarioRolRepo.save(roleLinks);
+    }
+
+    // JWT
     const payload = { sub: user.id, email: user.email };
+
     return {
       access_token: this.jwtService.sign(payload),
     };
@@ -78,5 +105,17 @@ export class AuthService {
     });
 
     return await this.apiKeyRepo.save(apiKey);
+  }
+
+  async findByIdWithRolesAndPermissions(userId: string) {
+    return await this.userRepo.findOne({
+      where: { id: userId },
+      relations: [
+        'usuarioRoles',
+        'usuarioRoles.rol',
+        'usuarioRoles.rol.permisos',
+        'usuarioRoles.rol.permisos.permiso',
+      ],
+    });
   }
 }

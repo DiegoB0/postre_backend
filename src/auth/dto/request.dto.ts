@@ -23,4 +23,7 @@ export class RegisterDto {
   @ApiProperty({ example: 'bob esponja' })
   @IsString()
   name: string;
+
+  @ApiProperty({ example: [] })
+  roles?: string[];
 }
