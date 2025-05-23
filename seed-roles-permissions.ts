@@ -1,18 +1,25 @@
 import { DataSource } from 'typeorm';
-import { Rol } from 'src/auth/entities/roles.entity';
+import { Rol } from './src/auth/entities/roles.entity';
 import { Permiso } from './src/auth/entities/permisos.entity';
 import { RolPermiso } from './src/auth/entities/rol_permiso.entity';
-import { ValidRoles } from 'src/auth/types/valid-roles';
-import { CurrentPermissions } from 'src/auth/types/current-permissions';
+import { ValidRoles } from './src/auth/types/valid-roles';
+import { CurrentPermissions } from './src/auth/types/current-permissions';
+import * as dotenv from 'dotenv';
+import { User } from './src/auth/entities/usuarios.entity';
+import { UsuarioRol } from './src/auth/entities/usuario_rol.entity';
+import { ApiKey } from './src/auth/entities/api_keys.entity';
 
-// Setup your connection (adjust config as needed)
+dotenv.config();
+
 const AppDataSource = new DataSource({
   type: 'postgres',
-  url: process.env.DATABASE_URL, // should point to your Supabase DB
-
-  entities: [Rol, Permiso, RolPermiso],
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT || '5432', 10),
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  entities: [Rol, Permiso, RolPermiso, User, UsuarioRol, ApiKey],
   synchronize: false,
-
   logging: true,
 });
 
@@ -26,6 +33,7 @@ async function seedRolesAndPermissions() {
   // Seed Roles
   for (const roleName of Object.values(ValidRoles)) {
     const exists = await roleRepo.findOneBy({ nombre: roleName });
+
     if (!exists) {
       await roleRepo.save(roleRepo.create({ nombre: roleName }));
     }
@@ -39,28 +47,31 @@ async function seedRolesAndPermissions() {
     }
   }
 
-  // Example: Grant all permissions to postre-admin
+  // Grant all permissions to postre-admin
   const postreAdmin = await roleRepo.findOneBy({
     nombre: ValidRoles.PostreAdmin,
   });
-  const allPermissions = await permisoRepo.find();
 
-  for (const permiso of allPermissions) {
-    const exists = await rolPermisoRepo.findOne({
-      where: {
-        rol: { id: postreAdmin!.id },
-        permiso: { id: permiso.id },
-      },
-      relations: ['rol', 'permiso'],
-    });
+  if (postreAdmin) {
+    const allPermissions = await permisoRepo.find();
 
-    if (!exists) {
-      await rolPermisoRepo.save(
-        rolPermisoRepo.create({
-          rol: postreAdmin!,
-          permiso,
-        }),
-      );
+    for (const permiso of allPermissions) {
+      const exists = await rolPermisoRepo.findOne({
+        where: {
+          rol: { id: postreAdmin.id },
+          permiso: { id: permiso.id },
+        },
+        relations: ['rol', 'permiso'],
+      });
+
+      if (!exists) {
+        await rolPermisoRepo.save(
+          rolPermisoRepo.create({
+            rol: postreAdmin,
+            permiso,
+          }),
+        );
+      }
     }
   }
 
