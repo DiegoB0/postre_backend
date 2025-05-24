@@ -57,4 +57,12 @@ export enum CurrentPermissions {
   ListCuenta = 'list-cuenta',
   DeleteCuenta = 'delete-cuenta',
   UpdateCuenta = 'update-cuenta',
+
+  /*
+   * Permissions for clients
+   */
+  CreateClient = 'create-client',
+  ListClient = 'list-client',
+  DeleteClient = 'delete-client',
+  UpdateClient = 'update-client',
 }
