@@ -35,6 +35,8 @@ export class Restaurant {
   @Column({ nullable: true })
   type: string;
 
+  // ! Operative Hours May Change into a separate table to handle multiple schedule and days
+  // * This change may be needed for the cash_movements table in order to control hours and days for entries
   @Column({ nullable: true })
   operative_hours: string;
 

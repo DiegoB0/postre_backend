@@ -10,6 +10,7 @@ import {
 import { RestaurantService } from './restaurant.service';
 import { Restaurant } from './entities/restaurant.entity';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 
 @ApiTags('Restaurants')
 @Controller('restaurants')
@@ -19,7 +20,7 @@ export class RestaurantController {
   @Post()
   @ApiOperation({ summary: 'Create a new restaurant' })
   @ApiResponse({ status: 201, description: 'Restaurant created successfully.' })
-  create(@Body() data: Partial<Restaurant>) {
+  create(@Body() data: CreateRestaurantDto) {
     return this.restaurantService.create(data);
   }
 

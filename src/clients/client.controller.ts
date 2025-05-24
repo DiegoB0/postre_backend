@@ -10,6 +10,7 @@ import {
 import { ClientService } from './client.service';
 import { Client } from './entities/client.entity';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { CreateClientDto } from './dto/create-client.dto';
 
 @ApiTags('Clients')
 @Controller('clients')
@@ -19,7 +20,7 @@ export class ClientController {
   @Post()
   @ApiOperation({ summary: 'Create a new client' })
   @ApiResponse({ status: 201, description: 'Client created successfully.' })
-  create(@Body() data: Partial<Client>) {
+  create(@Body() data: CreateClientDto) {
     return this.clientService.create(data);
   }
 
