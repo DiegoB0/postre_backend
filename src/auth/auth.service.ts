@@ -69,7 +69,13 @@ export class AuthService {
   async login(dto: LoginDto) {
     const user = await this.userRepo.findOne({
       where: { email: dto.email },
-      select: ['id', 'email', 'password'],
+      select: ['id', 'email', 'password', 'name'],
+      relations: [
+        'usuarioRoles',
+        'usuarioRoles.rol',
+        'usuarioRoles.rol.permisos',
+        'usuarioRoles.rol.permisos.permiso',
+      ],
     });
 
     if (!user || !dto.password) {
@@ -80,7 +86,26 @@ export class AuthService {
     if (!passwordMatches) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    const payload = { sub: user.id, email: user.email };
+
+    // Map roles and permissions
+    const roles =
+      user.usuarioRoles?.map((userRole) => userRole.rol.nombre) || [];
+
+    const permissions =
+      user.usuarioRoles?.flatMap(
+        (userRole) =>
+          userRole.rol.permisos?.map((rp) => rp.permiso.nombre) || [],
+      ) || [];
+
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      name: user.name,
+      roles,
+      permissions,
+    };
+
+    console.log(payload);
     return {
       access_token: this.jwtService.sign(payload),
     };
