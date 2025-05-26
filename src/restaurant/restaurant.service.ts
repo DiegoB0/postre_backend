@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Restaurant } from './entities/restaurant.entity';
@@ -17,7 +17,7 @@ export class RestaurantService {
     const { clientId, ...restaurantData } = data;
     const client = await this.clientService.findOne(clientId);
     if (!client) {
-      throw new Error(`Client with id ${clientId} found`);
+      throw new NotFoundException(`Client with id ${clientId} not found`);
     }
     const restaurant = this.restaurantRepo.create({
       ...restaurantData,

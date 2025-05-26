@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional, IsBoolean } from 'class-validator';
-import { IsClientExists } from 'src/custom-decorators/is-client-exists.decorator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsBoolean,
+  IsUUID,
+} from 'class-validator';
+// import { IsClientExists } from 'src/custom-decorators/is-client-exists.decorator';
 
 export class CreateRestaurantDto {
   @ApiProperty({
@@ -144,7 +150,7 @@ export class CreateRestaurantDto {
     description: 'The ID of the client who owns the restaurant',
   })
   @IsString()
-  @IsClientExists({ message: 'El cliente no existe' })
+  @IsUUID()
   @IsNotEmpty()
   clientId: string; // This will map to the `client` foreign key
 }
